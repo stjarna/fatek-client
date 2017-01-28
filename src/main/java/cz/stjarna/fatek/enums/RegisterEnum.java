@@ -4,9 +4,7 @@ import cz.stjarna.fatek.register.IRegisterInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import static cz.stjarna.fatek.enums.RegisterLengthEnum.NIBBLE;
-import static cz.stjarna.fatek.enums.RegisterLengthEnum.WORD;
-import static cz.stjarna.fatek.enums.RegisterLengthEnum.DWORD;
+import static cz.stjarna.fatek.enums.RegisterLengthEnum.*;
 
 @AllArgsConstructor
 @Getter
@@ -41,7 +39,6 @@ public enum RegisterEnum implements IRegisterInfo {
         DD(5, DWORD);
 
 	private final int maxNumericAddressLength;
-
     private final RegisterLengthEnum registerLength;
 
     @Override
@@ -53,5 +50,4 @@ public enum RegisterEnum implements IRegisterInfo {
     public String toString() {
         return name();
     }
-
 }

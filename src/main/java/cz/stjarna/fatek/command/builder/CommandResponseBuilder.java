@@ -13,11 +13,12 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @Slf4j
-public class CommandResponseBuilder implements IBuilder<Response> {
+public class CommandResponseBuilder<RESULT_TYPE> implements IBuilder<Response<RESULT_TYPE>> {
 
     public static final String MESSAGE_MUST_BE_READ_FIRST = "Response must be read first";
 
@@ -27,6 +28,7 @@ public class CommandResponseBuilder implements IBuilder<Response> {
     public static final int OFFSET_DATA = 6;
     private final int expectedSlaveStationId;
     private final CommandEnum expectedCommandCode;
+    private final Function<byte[], RESULT_TYPE> resultFunction;
 
     private AbstractCommand command;
     private int stationId;
@@ -36,12 +38,13 @@ public class CommandResponseBuilder implements IBuilder<Response> {
     private byte[] payload;
     private final byte[] messageByteArray;
 
-    public CommandResponseBuilder(final int slaveStationId, final CommandEnum commandCode, final byte[] receivedData) {
+    public CommandResponseBuilder(final int slaveStationId, final CommandEnum commandCode, final byte[] receivedData, final Function<byte[], RESULT_TYPE> resultFunction) {
         checkNotNull(commandCode, "Command code cannot be null");
         checkNotNull(receivedData, "Received data cannot be null");
         this.messageByteArray = receivedData.clone();
         this.expectedSlaveStationId = slaveStationId;
         this.expectedCommandCode = commandCode;
+        this.resultFunction = resultFunction;
     }
 
     private CommandResponseBuilder readStationId() throws FatekException {
@@ -90,7 +93,7 @@ public class CommandResponseBuilder implements IBuilder<Response> {
         }
 
         final ParsedValue parsedValue = new ParsedValue(messageByteArray, offset, messageByteArray.length - 3 - offset);
-        payload = parsedValue.getByteData();
+        payload = parsedValue.getByteArrayData();
         log.debug("Data parsed: {}", parsedValue);
         return this;
     }
@@ -155,20 +158,28 @@ public class CommandResponseBuilder implements IBuilder<Response> {
                 .readData()
                 .readChecksum()
                 .verifyResponse();
-        return new Response(stationId, commandCode, checkSum, messageByteArray, payload);
+        return new Response(stationId, commandCode, checkSum, messageByteArray, payload, extractResult());
+    }
+
+    private RESULT_TYPE extractResult() {
+        RESULT_TYPE result = null;
+        if (resultFunction != null) {
+            result = resultFunction.apply(this.payload);
+            log.debug("Extracted result {}", result);
+        }
+        return result;
     }
 
     @ToString
     class ParsedValue {
-
         @Getter
-        private final byte[] byteData;
+        private final byte[] byteArrayData;
         @Getter
         private final String stringData;
 
         ParsedValue(final byte[] input, final int offset, final int length) {
-            this.byteData = Arrays.copyOfRange(input, offset, offset + length);
-            stringData = new String(this.byteData);
+            this.byteArrayData = Arrays.copyOfRange(input, offset, offset + length);
+            stringData = new String(this.byteArrayData);
         }
 
         public int getIntData() {

@@ -1,7 +1,5 @@
 package cz.stjarna.fatek.command;
 
-import cz.stjarna.fatek.command.response.Response;
-import cz.stjarna.fatek.enums.CommandEnum;
 import cz.stjarna.fatek.register.data.RRegister;
 import cz.stjarna.fatek.register.discrete.DWMRegister;
 import cz.stjarna.fatek.register.discrete.YRegister;
@@ -24,8 +22,7 @@ public class MixedReadCommandTest {
     @Test
     public void testGetResponseData() throws Exception {
         MixedReadCommand command = new MixedReadCommand(new RRegister(1), new YRegister(9), new DWMRegister(0));
-        Response response = new Response(99, CommandEnum.MIXED_READ.getCode(), 0x00, null, "5C341003547BA".getBytes());
-        List<Long> result = command.getResponseData(response);
+        List<Long> result = command.getResultFunction().apply("5C341003547BA".getBytes());
         assertNotNull("Result cannot be null", result);
         assertEquals("Size does not match", 3, result.size());
         assertEquals("Value does not match", 0x5C34L, result.get(0).longValue());

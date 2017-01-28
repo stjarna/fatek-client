@@ -10,5 +10,4 @@ public enum RunStopControlEnum {
     STOP((byte)0);
 
 	private byte value;
-
 }

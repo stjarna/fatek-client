@@ -1,7 +1,5 @@
 package cz.stjarna.fatek.command;
 
-import cz.stjarna.fatek.command.response.Response;
-import cz.stjarna.fatek.enums.CommandEnum;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -19,8 +17,7 @@ public class TestingLoopBackCommandTest {
     @Test
     public void testGetResponseData() throws Exception {
         TestingLoopBackCommand command = new TestingLoopBackCommand("ABCDEFG");
-        Response response = new Response(99, CommandEnum.READ_FROM_DISCRETE_REGISTER.getCode(), 0x00, null, "ABCDEFG".getBytes());
-        String result = command.getResponseData(response);
+        String result = command.getResultFunction().apply("ABCDEFG".getBytes());
         assertNotNull("Result cannot be null", result);
         assertEquals("Expected value does not match", "ABCDEFG", result);
     }

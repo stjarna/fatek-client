@@ -1,7 +1,5 @@
 package cz.stjarna.fatek.command;
 
-import cz.stjarna.fatek.command.response.Response;
-import cz.stjarna.fatek.enums.CommandEnum;
 import cz.stjarna.fatek.register.discrete.XRegister;
 import org.junit.Test;
 
@@ -22,8 +20,7 @@ public class ReadDiscreteRegisterStatusCommandTest {
     @Test
     public void testGetResponseData() throws Exception {
         DiscreteRegisterStatusReadCommand command = new DiscreteRegisterStatusReadCommand(new XRegister(8), 5);
-        Response response = new Response(99, CommandEnum.READ_DISCRETE_REGISTER_STATUS.getCode(), 0x00, null, "11111".getBytes());
-        List<Long> result = command.getResponseData(response);
+        List<Long> result = command.getResultFunction().apply("11111".getBytes());
         assertNotNull("Result cannot be null", result);
         assertEquals("Size does not match", 5, result.size());
         for (int i = 0; i < result.size(); i++) {

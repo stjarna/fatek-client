@@ -16,7 +16,7 @@ public class WriteDiscreteRegisterCommand extends AbstractWriteCommand {
     private final List<Long> statusList;
 
 	public WriteDiscreteRegisterCommand(final DiscreteRegister offsetRegister, final int registersCount, final List<Long> statusList) throws FatekException {
-        checkNotNull(offsetRegister, "Offser register cannot be null");
+        checkNotNull(offsetRegister, "Offset register cannot be null");
         checkNotNull(statusList, "Status list cannot be null");
 		this.offsetRegister = offsetRegister;
 		this.registersCount = registersCount;

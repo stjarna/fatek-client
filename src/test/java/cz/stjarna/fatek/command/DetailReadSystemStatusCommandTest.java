@@ -1,8 +1,6 @@
 package cz.stjarna.fatek.command;
 
 import cz.stjarna.fatek.command.response.DetailedSystemStatus;
-import cz.stjarna.fatek.command.response.Response;
-import cz.stjarna.fatek.enums.CommandEnum;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -19,8 +17,7 @@ public class DetailReadSystemStatusCommandTest {
     @Test
     public void testGetResponseData() throws Exception {
         DetailReadSystemStatusCommand command = new DetailReadSystemStatusCommand();
-        Response response = new Response(99, CommandEnum.DETAIL_READ_SYSTEM_STATUS.getCode(), 0x00, null, "210102408000010001000064006407D203E800001F88100001000100".getBytes());
-        DetailedSystemStatus result = command.getResponseData(response);
+        DetailedSystemStatus result = command.getResultFunction().apply("210102408000010001000064006407D203E800001F88100001000100".getBytes());
         assertNotNull("Result cannot be null", result);
 
         assertTrue("Run flag must be TRUE", result.isRun());

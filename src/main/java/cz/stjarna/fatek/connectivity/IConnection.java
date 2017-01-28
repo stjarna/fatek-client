@@ -11,5 +11,4 @@ public interface IConnection {
     OutputStream getOutputStream() throws IOException;
     boolean isConnected();
     void close() throws IOException;
-
 }

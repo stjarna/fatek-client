@@ -1,11 +1,11 @@
 package cz.stjarna.fatek.command;
 
-import cz.stjarna.fatek.command.response.Response;
+import java.util.function.Function;
 
 public abstract class AbstractWriteCommand extends AbstractCommand<Void> {
 
     @Override
-    public Void getResponseData(final Response response) {
-        return null;
+    public Function<byte[], Void> getResultFunction() {
+        return (byte[] payload) -> null;
     }
 }

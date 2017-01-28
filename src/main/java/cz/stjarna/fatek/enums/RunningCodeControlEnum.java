@@ -12,5 +12,4 @@ public enum RunningCodeControlEnum {
 
     @Getter
 	private byte value;
-
 }

@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum RegisterLengthEnum {
 
-    NIBBLE(4, "%X", 0x0F),
+    NIBBLE(4, "%X", 0xF),
 	BYTE(8, "%02X", 0xFF),
 	WORD(16, "%04X", 0xFFFF),
 	DWORD(32, "%08X", 0xFFFFFFFF);
@@ -26,5 +26,4 @@ public enum RegisterLengthEnum {
     public int getNumberOfNibbles() {
         return length / 4;
     }
-
 }
