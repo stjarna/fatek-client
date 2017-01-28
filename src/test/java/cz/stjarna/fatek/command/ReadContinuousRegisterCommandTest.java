@@ -22,8 +22,7 @@ public class ReadContinuousRegisterCommandTest {
     @Test
     public void testGetResponseData() throws Exception {
         ReadContinuousRegisterCommand command = new ReadContinuousRegisterCommand(new RRegister(12), 3);
-        Response response = new Response(99, CommandEnum.READ_FROM_CONTINUOUS_REGISTER.getCode(), 0x00, null, "10A57FC40001".getBytes());
-        List<Long> result = command.getResponseData(response);
+        List<Long> result = command.getResultFunction().apply("10A57FC40001".getBytes());
         assertNotNull("Result cannot be null", result);
         assertEquals("Size does not match", 3, result.size());
 

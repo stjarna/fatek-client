@@ -27,7 +27,7 @@ public class CommandBuilderTest {
 
     @Test
     public void testReadFromDiscreteRegisterX() throws Exception {
-        CommandBuilder commandBuilder = new CommandBuilder(99);
+        CommandBuilder commandBuilder = CommandBuilder.builder().slaveStationId(99);
 
         byte[] commandData = commandBuilder.commandCode(CommandEnum.READ_FROM_DISCRETE_REGISTER)
                 .data(getTestRequestDataForReadFromDiscreteRegisterX())
@@ -38,7 +38,7 @@ public class CommandBuilderTest {
 
     @Test
     public void testReadFromDiscreteRegisterY() throws Exception {
-        CommandBuilder commandBuilder = new CommandBuilder(99);
+        CommandBuilder commandBuilder = CommandBuilder.builder().slaveStationId(99);
 
         byte[] commandData = commandBuilder.commandCode(CommandEnum.READ_FROM_DISCRETE_REGISTER)
                 .data(getTestRequestDataForReadFromDiscreteRegisterY())

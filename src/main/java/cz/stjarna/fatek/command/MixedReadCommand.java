@@ -1,14 +1,16 @@
 package cz.stjarna.fatek.command;
 
 import com.google.common.base.Joiner;
-import cz.stjarna.fatek.command.response.Response;
 import cz.stjarna.fatek.enums.CommandEnum;
 import cz.stjarna.fatek.enums.RegisterLengthEnum;
 import cz.stjarna.fatek.exception.FatekException;
 import cz.stjarna.fatek.register.AbstractRegister;
+import cz.stjarna.fatek.util.CommonConstants;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -35,18 +37,26 @@ public class MixedReadCommand extends AbstractCommand<List<Long>> {
                     .append(Joiner.on("").join(registers)).toString();
 	}
 
-    @Override
-	public List<Long> getResponseData(final Response response) {
-        checkNotNull(response, "Response cannot be null");
-        final byte[] payload = response.getPayload();
-        final List<Long> result = new ArrayList<Long>(registers.length);
-        int offset = 0;
-        RegisterLengthEnum registerLength;
-        for (int i = 0; i < registers.length; i++) {
-            registerLength = registers[i].getRegisterLength();
-            result.add(registers[i].readFromMixedByteArray(payload, offset));
-            offset += registerLength.getNumberOfNibbles();
-		}
-        return result;
-	}
+    public Function<byte[],List<Long>> getResultFunction() {
+	    return (byte[] payload) -> {
+            final List<Long> result = new ArrayList<Long>(registers.length);
+            int offset = 0;
+            RegisterLengthEnum registerLength;
+            for (int i = 0; i < registers.length; i++) {
+                registerLength = registers[i].getRegisterLength();
+                result.add(readFromMixedByteArray(payload, offset, registers[i].getRegisterLength().getNumberOfNibbles()));
+                offset += registerLength.getNumberOfNibbles();
+            }
+            return result;
+        };
+    }
+
+    private long readFromMixedByteArray(final byte[] byteArray, final int index, final int bufferLength) {
+        checkNotNull(byteArray, "Byte array cannot be null");
+        checkArgument(byteArray.length >= index+bufferLength, "Invalid index, data cannot be read due to being out of range");
+        final int from = index;
+        final int to = from + bufferLength;
+        final byte[] buffer = Arrays.copyOfRange(byteArray, from, to);
+        return Long.parseLong(new String(buffer), CommonConstants.RADIX_HEX);
+    }
 }

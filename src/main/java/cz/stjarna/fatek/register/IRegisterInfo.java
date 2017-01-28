@@ -7,5 +7,4 @@ public interface IRegisterInfo {
     String getName();
     int getMaxNumericAddressLength();
     RegisterLengthEnum getRegisterLength();
-
 }

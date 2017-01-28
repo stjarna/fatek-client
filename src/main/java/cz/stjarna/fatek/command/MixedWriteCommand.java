@@ -1,12 +1,12 @@
 package cz.stjarna.fatek.command;
 
-import cz.stjarna.fatek.command.response.Response;
 import cz.stjarna.fatek.enums.CommandEnum;
 import cz.stjarna.fatek.enums.RegisterLengthEnum;
 import cz.stjarna.fatek.exception.FatekException;
 import cz.stjarna.fatek.register.AbstractRegister;
 
 import java.util.List;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -28,7 +28,7 @@ public class MixedWriteCommand extends AbstractCommand<Void> {
     }
 
     @Override
-    public String getRequestData(){
+    public String getRequestData() {
         final StringBuilder builder = new StringBuilder()
                 .append(String.format(RegisterLengthEnum.BYTE.getFormat(), registers.size() == 256 ? 0 : registers.size() & RegisterLengthEnum.BYTE.getMask()));
 
@@ -41,7 +41,7 @@ public class MixedWriteCommand extends AbstractCommand<Void> {
     }
 
     @Override
-    public Void getResponseData(final Response response) {
-        return null;
+    public Function<byte[], Void> getResultFunction() {
+        return (byte[] payload) -> null;
     }
 }

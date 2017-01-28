@@ -19,6 +19,6 @@ public abstract class AbstractSystemStatusCommand<TYPE> extends AbstractCommand<
         checkArgument(byteArray.length >= offset + 2, "Invalid offset " + offset + ", byte cannot be read due to being out of range.");
         checkArgument(offset >= 0, "Offset cannot be negative");
         final byte[] buffer = Arrays.copyOfRange(byteArray, offset, offset + 2);
-        return (Character.digit(buffer[0], CommonConstants.RADIX_HEX) << 4 | Character.digit(buffer[1], CommonConstants.RADIX_HEX)) & RegisterLengthEnum.BYTE.getMask();
+        return Integer.parseInt(new String(buffer), CommonConstants.RADIX_HEX) & RegisterLengthEnum.BYTE.getMask();
     }
 }

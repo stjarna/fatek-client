@@ -7,14 +7,14 @@ import cz.stjarna.fatek.register.discrete.DiscreteRegister;
 
 public class DiscreteRegisterReadCommand extends AbstractReadCommand {
 
-	public DiscreteRegisterReadCommand(final DiscreteRegister offsetRegister, final int registersCount) throws FatekException {
+    public DiscreteRegisterReadCommand(final DiscreteRegister offsetRegister, final int registersCount) throws FatekException {
         super(offsetRegister, registersCount);
-	}
+    }
 
-	@Override
-	public CommandEnum getCommandCode() {
-		return CommandEnum.READ_FROM_DISCRETE_REGISTER;
-	}
+    @Override
+    public CommandEnum getCommandCode() {
+        return CommandEnum.READ_FROM_DISCRETE_REGISTER;
+    }
 
 	@Override
 	public String getRequestData() {

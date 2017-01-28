@@ -1,9 +1,10 @@
 package cz.stjarna.fatek.command;
 
-import cz.stjarna.fatek.command.response.Response;
 import cz.stjarna.fatek.enums.CommandEnum;
 import cz.stjarna.fatek.enums.RunStopControlEnum;
 import cz.stjarna.fatek.exception.FatekException;
+
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -26,9 +27,8 @@ public class ControlCommand extends AbstractCommand<Void> {
 		return String.valueOf(runStopControl.getValue());
 	}
 
-    @Override
-	public Void getResponseData(final Response response) {
-        return null;
+	@Override
+	public Function<byte[], Void> getResultFunction() {
+		return (byte[] payload) -> null;
 	}
-
 }

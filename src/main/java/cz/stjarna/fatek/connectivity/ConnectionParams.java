@@ -1,6 +1,5 @@
 package cz.stjarna.fatek.connectivity;
 
-import com.google.common.collect.Maps;
 import cz.stjarna.fatek.enums.ProtocolEnum;
 import cz.stjarna.fatek.exception.FatekException;
 import cz.stjarna.fatek.util.CommonConstants;
@@ -10,7 +9,10 @@ import org.apache.commons.lang.StringUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -23,21 +25,12 @@ public class ConnectionParams {
 	private static final String PARAM_SLAVE_STATION_ID = "slaveStationId";
     private static final int PARAM_SLAVE_STATION_ID_DEFAULT = 1;
 
-    private static final String PARAM_CP_INITIAL_SIZE = "initialSize";
-    private static final int PARAM_CP_INITIAL_SIZE_DEFAULT = 1;
-
-    private static final String PARAM_CP_MAX_SIZE = "maxSize";
-    private static final int PARAM_CP_MAX_SIZE_DEFAULT = 3;
-
-    private static final String PARAM_CP_CHECK_INTERVAL = "checkInterval";
-    private static final int PARAM_CP_CHECK_INTERVAL_DEFAULT = 20000;
-	
 	private final Map<String,String> params;
 	private final URI uri;
 
 
     public ConnectionParams(final URI uri) throws FatekException {
-        this.params = Maps.newHashMap();
+        this.params = new HashMap();
         this.uri = uri;
         parseURLParams(uri);
     }
@@ -46,13 +39,13 @@ public class ConnectionParams {
         checkNotNull(url, "Url cannot be null");
 		log.debug("URL params parsing started");
 		final String unescapedUriString = decodeEscapedURL(uri.getRawQuery());
-		if (!StringUtils.isBlank(unescapedUriString)) {
-            ConnectionParamParser paramParser;
-			for (final String paramString : StringUtils.split(unescapedUriString, PARAM_DELIMITER)) {
-				log.debug("URL param: {}", paramString);
-				paramParser = new ConnectionParamParser(paramString);
-				params.put(paramParser.getKey(), paramParser.getValue());
-			}
+		if (StringUtils.isNotEmpty(unescapedUriString)) {
+            params.putAll(Arrays.stream(unescapedUriString.split(PARAM_DELIMITER))
+                    .map(paramString -> {
+                        log.debug("URL param: {}", paramString);
+                        return new ConnectionParamParser(paramString);
+                    })
+                    .collect(Collectors.toMap(ConnectionParamParser::getKey, ConnectionParamParser::getValue)));
 		}
 		log.debug("URL params parsing completed");
 	}
@@ -71,8 +64,7 @@ public class ConnectionParams {
     }
     
     public ProtocolEnum getProtocol() {
-    	final String scheme = uri.getScheme();
-        return ProtocolEnum.valueOf(scheme.toUpperCase());
+        return ProtocolEnum.valueOf(uri.getScheme().toUpperCase());
     }
     
     public String getHost() {
@@ -88,34 +80,10 @@ public class ConnectionParams {
         return port;
     }
     
-    public int getStationId() {
-        int result = PARAM_SLAVE_STATION_ID_DEFAULT;
+    public byte getStationId() {
+        byte result = PARAM_SLAVE_STATION_ID_DEFAULT;
         if (params.containsKey(PARAM_SLAVE_STATION_ID)) {
-            result = Integer.parseInt(params.get(PARAM_SLAVE_STATION_ID));
-        }
-        return result;
-    }
-
-    public int getInitialSize() {
-        int result = PARAM_CP_INITIAL_SIZE_DEFAULT;
-        if (params.containsKey(PARAM_CP_INITIAL_SIZE)) {
-            result = Integer.parseInt(params.get(PARAM_CP_INITIAL_SIZE));
-        }
-        return result;
-    }
-
-    public int getMaxSize() {
-        int result = PARAM_CP_MAX_SIZE_DEFAULT;
-        if (params.containsKey(PARAM_CP_MAX_SIZE)) {
-            result = Integer.parseInt(params.get(PARAM_CP_MAX_SIZE));
-        }
-        return result;
-    }
-
-    public long getCheckInterval() {
-        int result = PARAM_CP_CHECK_INTERVAL_DEFAULT;
-        if (params.containsKey(PARAM_CP_CHECK_INTERVAL)) {
-            result = Integer.parseInt(params.get(PARAM_CP_CHECK_INTERVAL));
+            result = Byte.parseByte(params.get(PARAM_SLAVE_STATION_ID));
         }
         return result;
     }

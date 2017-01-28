@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static cz.stjarna.fatek.util.CommonConstants.ENCONDING_ASCII;
 
@@ -21,14 +22,24 @@ public class CommandBuilder implements IBuilder<byte[]> {
     private final ByteArrayOutputStream buffer;
     private byte[] payload;
     private CommandEnum command;
-    private final int slaveStationId;
+    private int slaveStationId;
 
-    public CommandBuilder(final int slaveStationId) {
-        this.buffer = new ByteArrayOutputStream();
-        this.slaveStationId = slaveStationId;
+    public static CommandBuilder builder() {
+        return new CommandBuilder();
     }
 
-    public CommandBuilder commandCode(final CommandEnum command) throws FatekException {
+    private CommandBuilder() {
+        buffer = new ByteArrayOutputStream();
+    }
+
+    public CommandBuilder slaveStationId(final int slaveStationId) {
+        checkArgument(slaveStationId > 0, "Slave id must be provided");
+        log.debug("Adding slave id {}", slaveStationId);
+        this.slaveStationId = slaveStationId;
+        return this;
+    }
+
+    public CommandBuilder commandCode(final CommandEnum command) {
         checkNotNull(command, "Command code cannot be null");
         log.debug("Adding command code {}", command);
         this.command = command;
@@ -48,12 +59,12 @@ public class CommandBuilder implements IBuilder<byte[]> {
     @Override
     public byte[] build() throws FatekException {
         try {
-            this.buffer.write(CommonConstants.START_OF_TEXT);
-            this.buffer.write(convertByte2ByteArray(slaveStationId));
-            this.buffer.write(convertByte2ByteArray(command.getCode()));
-            this.buffer.write(payload);
-            this.buffer.write(convertByte2ByteArray(LRCUtils.countLRC(payload)));
-            this.buffer.write(CommonConstants.END_OF_TEXT);
+            buffer.write(CommonConstants.START_OF_TEXT);
+            buffer.write(convertByte2ByteArray(slaveStationId));
+            buffer.write(convertByte2ByteArray(command.getCode()));
+            buffer.write(payload);
+            buffer.write(convertByte2ByteArray(LRCUtils.countLRC(payload)));
+            buffer.write(CommonConstants.END_OF_TEXT);
             return buffer.toByteArray();
         } catch (IOException e) {
             throw new FatekException("Unable to build request", e);

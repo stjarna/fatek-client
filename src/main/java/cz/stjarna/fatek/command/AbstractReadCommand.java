@@ -1,10 +1,10 @@
 package cz.stjarna.fatek.command;
 
-import cz.stjarna.fatek.command.response.Response;
 import cz.stjarna.fatek.register.discrete.DiscreteRegister;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -12,7 +12,6 @@ public abstract class AbstractReadCommand extends AbstractCommand<List<Long>> {
 
     protected final DiscreteRegister offsetRegister;
     protected final int registersCount;
-    protected List<Long> result;
 
     public AbstractReadCommand(final DiscreteRegister offsetRegister, final int registersCount) {
         checkNotNull(offsetRegister, "Offset register cannot be null");
@@ -21,15 +20,13 @@ public abstract class AbstractReadCommand extends AbstractCommand<List<Long>> {
     }
 
     @Override
-	public List<Long> getResponseData(final Response response) {
-        checkNotNull(response, "Response cannot be null");
-        final byte[] payload = response.getPayload();
-        result = new ArrayList<Long>(registersCount);
-
-		for (int i = 0; i < registersCount; i++) {
-			result.add(offsetRegister.readFromUniformByteArray(payload, i));
-		}
-
-        return result;
-	}
+    public Function<byte[], List<Long>> getResultFunction() {
+        return (byte[] payload) -> {
+            List<Long> result = new ArrayList<>(registersCount);
+            for (int i = 0; i < registersCount; i++) {
+                result.add(readFromUniformByteArray(payload, i, offsetRegister.getRegisterLength().getNumberOfNibbles()));
+            }
+            return result;
+        };
+    }
 }
